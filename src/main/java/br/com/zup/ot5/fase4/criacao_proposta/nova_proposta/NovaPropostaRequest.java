@@ -2,6 +2,8 @@ package br.com.zup.ot5.fase4.criacao_proposta.nova_proposta;
 
 import java.math.BigDecimal;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -43,4 +45,15 @@ public class NovaPropostaRequest {
 		return new Proposta(this.documento, this.nome, this.email, this.endereco, this.salario);
 	}
 	
+	public boolean jaExisteUmaPropostaCriadaParaMesmoSolicitante(EntityManager manager) {
+		try {
+			manager.createQuery("select p from Proposta p where p.documento = :Pdocumento", Proposta.class)
+			   .setParameter("Pdocumento", this.documento)
+			   .getSingleResult();
+			return true;
+		}catch(NoResultException exc) {
+			
+			return false;
+		}
+	}
 }

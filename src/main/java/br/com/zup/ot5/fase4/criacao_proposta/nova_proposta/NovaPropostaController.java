@@ -5,6 +5,7 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,9 +25,12 @@ public class NovaPropostaController {
 	@PostMapping
 	@Transactional
 	public ResponseEntity<?> cadastra(@RequestBody @Valid NovaPropostaRequest requisicao, UriComponentsBuilder builder) {
+		
+		if(requisicao.jaExisteUmaPropostaCriadaParaMesmoSolicitante(em))
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+		
 		Proposta proposta = requisicao.paraProposta();
 		em.persist(proposta);
 		return ResponseEntity.created(builder.path("/propostas/{id}").buildAndExpand(proposta.getId()).toUri()).build();
 	}
-	
 }
