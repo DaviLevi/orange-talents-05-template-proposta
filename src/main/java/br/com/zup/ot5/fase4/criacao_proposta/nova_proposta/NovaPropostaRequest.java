@@ -14,8 +14,8 @@ import br.com.zup.ot5.fase4.criacao_proposta.dominio.Proposta;
 
 public class NovaPropostaRequest {
 
-	@CpfOuCnpj
 	@NotBlank
+	@CpfOuCnpj
 	private String documento;
 	
 	@NotBlank
