@@ -1,4 +1,4 @@
-package br.com.zup.ot5.fase4.criacao_proposta.sistemas_externos.analise_financeira;
+package br.com.zup.ot5.fase4.criacao_proposta.nova_proposta;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;

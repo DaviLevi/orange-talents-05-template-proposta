@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.zup.ot5.fase4.criacao_proposta.dominio.Proposta;
-import br.com.zup.ot5.fase4.criacao_proposta.sistemas_externos.analise_financeira.AnalisadorFinanceiroProposta;
-import br.com.zup.ot5.fase4.criacao_proposta.sistemas_externos.analise_financeira.AnaliseFinanceiraResponse;
 
 @RestController
 @RequestMapping("/propostas")

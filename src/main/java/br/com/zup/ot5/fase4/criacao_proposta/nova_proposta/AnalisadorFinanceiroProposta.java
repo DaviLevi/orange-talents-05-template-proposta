@@ -1,4 +1,4 @@
-package br.com.zup.ot5.fase4.criacao_proposta.sistemas_externos.analise_financeira;
+package br.com.zup.ot5.fase4.criacao_proposta.nova_proposta;
 
 import javax.validation.Valid;
 
@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import br.com.zup.ot5.fase4.criacao_proposta.dominio.Proposta;
+import br.com.zup.ot5.fase4.criacao_proposta.sistemas_externos.analise_financeira.AnalisadorFinanceiroClient;
 import feign.FeignException;
 
 @Component

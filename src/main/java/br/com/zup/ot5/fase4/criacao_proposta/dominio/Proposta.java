@@ -2,6 +2,7 @@ package br.com.zup.ot5.fase4.criacao_proposta.dominio;
 
 import java.math.BigDecimal;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,43 +10,53 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
 import br.com.zup.ot5.fase4.criacao_proposta.core.validation.CpfOuCnpj;
-import br.com.zup.ot5.fase4.criacao_proposta.sistemas_externos.analise_financeira.ResultadoAnaliseFinanceira;
+import br.com.zup.ot5.fase4.criacao_proposta.nova_proposta.ResultadoAnaliseFinanceira;
 
 @Entity
 public class Proposta {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "PropostaID")
 	private Long id;
 	
 	@CpfOuCnpj
 	@NotBlank
-	@Column(unique = true)
+	@Column(name = "Documento", unique = true)
 	private String documento;
 	
 	@NotBlank
+	@Column(name = "Nome")
 	private String nome;
 	
 	@NotBlank
 	@Email
+	@Column(name = "Email")
 	private String email;
 	
 	@NotBlank
+	@Column(name = "Endereco")
 	private String endereco;
 	
 	@PositiveOrZero
 	@NotNull
+	@Column(name = "Salario")
 	private BigDecimal salario;
 	
 	@Enumerated(EnumType.STRING)
-	private StatusProposta status;
+	@Column(name = "Status")
+	private StatusProposta statusProposta;
 
+	@OneToOne(mappedBy = "proposta", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	private Cartao cartao;
+	
 	@Deprecated protected Proposta() {}
 	
 	public Proposta(@NotBlank String documento, @NotBlank String nome, @NotBlank @Email String email,
@@ -63,7 +74,7 @@ public class Proposta {
 	}
 	
 	public void anexaResultadoAnaliseFinanceira(ResultadoAnaliseFinanceira resultado) {
-		this.status = resultado.normaliza();
+		this.statusProposta = resultado.normaliza();
 	}
 
 	public String getDocumento() {
@@ -74,6 +85,20 @@ public class Proposta {
 		return nome;
 	}
 	
+	public boolean isElegivel() {
+		return this.statusProposta == StatusProposta.ELEGIVEL;
+	}
+
+	public StatusProposta getStatus() {
+		return statusProposta;
+	}
+
+	public Cartao getCartao() {
+		return cartao;
+	}
 	
-	
+	public void associaCartao(Cartao cartao) {
+		this.cartao = cartao;
+		cartao.associaProposta(this);
+	}
 }
