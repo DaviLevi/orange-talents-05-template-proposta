@@ -101,4 +101,20 @@ public class Proposta {
 		this.cartao = cartao;
 		cartao.associaProposta(this);
 	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getEndereco() {
+		return endereco;
+	}
+
+	public BigDecimal getSalario() {
+		return salario;
+	}
+
+	public StatusProposta getStatusProposta() {
+		return statusProposta;
+	}
 }
