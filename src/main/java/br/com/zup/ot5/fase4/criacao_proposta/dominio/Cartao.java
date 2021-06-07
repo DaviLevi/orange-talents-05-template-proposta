@@ -1,6 +1,8 @@
 package br.com.zup.ot5.fase4.criacao_proposta.dominio;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -8,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -36,6 +39,9 @@ public class Cartao {
 	@OneToOne(mappedBy = "cartao", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private Vencimento vencimento;
 	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "cartaoBloqueiado", cascade = {CascadeType.MERGE})
+	private Set<Bloqueio> bloqueios;
+	
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "PropostaID")
 	@NotNull
@@ -43,7 +49,6 @@ public class Cartao {
 	
 	@Deprecated public Cartao(){}
 	
-
 	public Cartao(@NotBlank String id, @NotBlank String titular, @NotNull LocalDateTime emitidoEm, @NotNull Integer limite, @NotNull @Valid Vencimento vencimento,
 			@Valid Proposta proposta) {
 		this.id = id;
@@ -85,5 +90,20 @@ public class Cartao {
 	public void associaVencimento(Vencimento vencimento) {
 		this.vencimento = vencimento;
 		vencimento.associaCartao(this);
+	}
+	
+	public boolean estaBloqueiado() {
+		Optional<Bloqueio> bloqueioVigente = this.bloqueios.stream().reduce((primeiro,segundo)-> {
+			if(segundo.foiCriadoDepoisDe(primeiro)) return segundo;
+			return primeiro;
+		});
+		if(bloqueioVigente.isEmpty()) return false;
+		if(bloqueioVigente.get().isAtivo()) return true;
+		return false;
+	}
+	
+	public void bloqueia(String ipCliente, String userAgent) {
+		Bloqueio bloqueio = new Bloqueio(this, ipCliente, userAgent);
+		this.bloqueios.add(bloqueio);
 	}
 }
