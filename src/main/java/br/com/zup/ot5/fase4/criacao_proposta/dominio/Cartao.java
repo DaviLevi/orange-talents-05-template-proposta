@@ -1,12 +1,13 @@
 package br.com.zup.ot5.fase4.criacao_proposta.dominio;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -46,6 +47,10 @@ public class Cartao {
 	@JoinColumn(name = "PropostaID")
 	@NotNull
 	private Proposta proposta;
+	
+	@Enumerated(EnumType.STRING)
+	@NotNull
+	private StatusCartao statusCartao = StatusCartao.ATIVO;
 	
 	@Deprecated public Cartao(){}
 	
@@ -92,18 +97,13 @@ public class Cartao {
 		vencimento.associaCartao(this);
 	}
 	
-	public boolean estaBloqueiado() {
-		Optional<Bloqueio> bloqueioVigente = this.bloqueios.stream().reduce((primeiro,segundo)-> {
-			if(segundo.foiCriadoDepoisDe(primeiro)) return segundo;
-			return primeiro;
-		});
-		if(bloqueioVigente.isEmpty()) return false;
-		if(bloqueioVigente.get().isAtivo()) return true;
-		return false;
+	public boolean estaBloqueado() {
+		return this.statusCartao == StatusCartao.BLOQUEADO;
 	}
 	
 	public void bloqueia(String ipCliente, String userAgent) {
 		Bloqueio bloqueio = new Bloqueio(this, ipCliente, userAgent);
+		this.statusCartao = StatusCartao.BLOQUEADO;
 		this.bloqueios.add(bloqueio);
 	}
 }

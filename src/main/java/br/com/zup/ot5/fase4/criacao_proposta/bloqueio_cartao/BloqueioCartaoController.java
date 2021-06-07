@@ -9,30 +9,35 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.zup.ot5.fase4.criacao_proposta.core.exception_handling.Erro;
 import br.com.zup.ot5.fase4.criacao_proposta.core.exception_handling.Erro.PropriedadeInvalida;
 import br.com.zup.ot5.fase4.criacao_proposta.dominio.Cartao;
+import br.com.zup.ot5.fase4.criacao_proposta.sistemas_externos.sistema_cartao.SistemaCartaoClient;
+import feign.FeignException;
 
 @RestController
-@RequestMapping("/cartoes/{idCartao}/bloqueia")
+@RequestMapping("/cartoes/{idCartao}/bloqueios")
 public class BloqueioCartaoController {
 
 	@PersistenceContext
 	private EntityManager manager;
 	
+	@Autowired
+	private SistemaCartaoClient cartaoApi;
+	
 	private final String LOCALHOST_IPV4 = "127.0.0.1";
 	private final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
 	
-	@PutMapping
+	@PostMapping
 	@Transactional
 	public ResponseEntity<?> bloquear(HttpServletRequest servletRequest, @PathVariable(required = false) String idCartao) {
 		
@@ -51,8 +56,8 @@ public class BloqueioCartaoController {
 		
 		Cartao cartaoEncontrado = cartao;
 		
-		if(cartaoEncontrado.estaBloqueiado()) {
-			Erro erro = new Erro(422, "Entidade não processável", "O cartão ja está bloqueiado.");
+		if(cartaoEncontrado.estaBloqueado()) {
+			Erro erro = new Erro(422, "Entidade não processável", "O cartão ja está bloqueado.");
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(erro);
 		}
 		
@@ -62,6 +67,14 @@ public class BloqueioCartaoController {
 		cartaoEncontrado.bloqueia(ipCliente, userAgent);
 		
 		manager.merge(cartaoEncontrado);
+		
+		try {
+			cartaoApi.notificaBloqueioDoCartao(idCartao , new NotificaBloqueioRequest("nosso-cartao"));
+		}catch(FeignException e) {
+			manager.getTransaction().rollback();
+			Erro erro = new Erro(422, "Entidade não processável", "Não foi possivel bloqueiar o cartao em todos os canais de venda.");
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(erro);
+		}
 		
 		return ResponseEntity.ok().build();
 		
