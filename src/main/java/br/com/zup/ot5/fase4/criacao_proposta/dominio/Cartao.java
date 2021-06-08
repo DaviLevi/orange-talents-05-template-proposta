@@ -42,6 +42,9 @@ public class Cartao {
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "cartaoBloqueiado", cascade = {CascadeType.MERGE})
 	private Set<Bloqueio> bloqueios;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "cartaoAvisado", cascade = {CascadeType.MERGE})
+	private Set<AvisoViagem> avisosViagem;
 	
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "PropostaID")
@@ -105,5 +108,9 @@ public class Cartao {
 		Bloqueio bloqueio = new Bloqueio(this, ipCliente, userAgent);
 		this.statusCartao = StatusCartao.BLOQUEADO;
 		this.bloqueios.add(bloqueio);
+	}
+	
+	public void adicionaAvisoViagem(AvisoViagem avisoViagem) {
+		this.avisosViagem.add(avisoViagem);
 	}
 }
