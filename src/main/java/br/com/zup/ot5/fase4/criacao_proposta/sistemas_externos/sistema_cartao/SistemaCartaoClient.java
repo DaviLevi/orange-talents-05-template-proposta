@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import br.com.zup.ot5.fase4.criacao_proposta.associa_cartao.BuscaCartaoResponse;
+import br.com.zup.ot5.fase4.criacao_proposta.associa_carteira.NotificaAssociacaoCarteiraRequest;
+import br.com.zup.ot5.fase4.criacao_proposta.associa_carteira.NotificaAssociacaoCarteiraResponse;
 import br.com.zup.ot5.fase4.criacao_proposta.aviso_viagem.NotificaAvisoViagemRequest;
 import br.com.zup.ot5.fase4.criacao_proposta.bloqueio_cartao.NotificaBloqueioRequest;
 
@@ -20,5 +22,8 @@ public interface SistemaCartaoClient {
     
     @RequestMapping(method = RequestMethod.POST, path = "/{idCartao}/avisos")
     void notificaAvisoViagem(@PathVariable String idCartao, NotificaAvisoViagemRequest requisicao);
+    
+    @RequestMapping(method = RequestMethod.POST, path = "/{idCartao}/carteiras")
+    NotificaAssociacaoCarteiraResponse notificaAssociacaoCarteira(@PathVariable String idCartao, NotificaAssociacaoCarteiraRequest requisicao);
 
 }

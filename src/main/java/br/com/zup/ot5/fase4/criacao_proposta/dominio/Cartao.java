@@ -1,6 +1,7 @@
 package br.com.zup.ot5.fase4.criacao_proposta.dominio;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -45,6 +46,9 @@ public class Cartao {
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "cartaoAvisado", cascade = {CascadeType.MERGE})
 	private Set<AvisoViagem> avisosViagem;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "cartaoAssociado", cascade = {CascadeType.MERGE})
+	private Set<Carteira> carteiras = new HashSet<>();
 	
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "PropostaID")
@@ -112,5 +116,13 @@ public class Cartao {
 	
 	public void adicionaAvisoViagem(AvisoViagem avisoViagem) {
 		this.avisosViagem.add(avisoViagem);
+	}
+	
+	public void associaCarteira(Carteira carteira) {
+		this.carteiras.add(carteira);
+	}
+	
+	public boolean jaPossuiUmaCarteiraDoTipo(TipoCarteira tipoRequisitado) {
+		return this.carteiras.stream().anyMatch(carteira -> carteira.ehDoTipo(tipoRequisitado));
 	}
 }
