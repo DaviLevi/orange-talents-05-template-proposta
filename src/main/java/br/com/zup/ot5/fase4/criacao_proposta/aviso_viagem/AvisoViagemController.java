@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -23,6 +24,8 @@ import br.com.zup.ot5.fase4.criacao_proposta.core.exception_handling.Erro;
 import br.com.zup.ot5.fase4.criacao_proposta.core.exception_handling.Erro.PropriedadeInvalida;
 import br.com.zup.ot5.fase4.criacao_proposta.dominio.AvisoViagem;
 import br.com.zup.ot5.fase4.criacao_proposta.dominio.Cartao;
+import br.com.zup.ot5.fase4.criacao_proposta.sistemas_externos.sistema_cartao.SistemaCartaoClient;
+import feign.FeignException;
 
 @RestController
 @RequestMapping("/cartoes/{idCartao}/avisos-viagem")
@@ -30,6 +33,9 @@ public class AvisoViagemController {
 
 	@PersistenceContext
 	private EntityManager manager;
+	
+	@Autowired
+	private SistemaCartaoClient cartaoApiLegado;
 	
 	private final String LOCALHOST_IPV4 = "127.0.0.1";
 	private final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
@@ -54,6 +60,12 @@ public class AvisoViagemController {
 		
 		String ipCliente = getClientIp(servletRequest);
 		String userAgent = servletRequest.getHeader("User-Agent");
+		
+		try {
+			cartaoApiLegado.notificaAvisoViagem(idCartao, new NotificaAvisoViagemRequest(userAgent, requisicao.getDataTerminoViagem()));
+		}catch(FeignException e) {
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Poxa! Nao foi possivel notificar o aviso de viagem :(");
+		}
 		
 		AvisoViagem avisoViagem = requisicao.converteParaAvisoViagem(ipCliente, userAgent, cartao);
 		
