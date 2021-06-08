@@ -9,6 +9,12 @@ public enum TipoCarteiraLegadoRequest {
 		public TipoCarteira paraTipoCarteira() {
 			return TipoCarteira.PAYPAL;
 		}
+	},
+	SAMSUNG_PAY{
+		@Override
+		public TipoCarteira paraTipoCarteira() {
+			return TipoCarteira.SAMSUNG_PAY;
+		}
 	};
 	
 	public abstract TipoCarteira paraTipoCarteira();

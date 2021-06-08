@@ -2,7 +2,7 @@ package br.com.zup.ot5.fase4.criacao_proposta.dominio;
 
 public enum TipoCarteira {
 
-	PAYPAL("Paypal");
+	PAYPAL("Paypal"), SAMSUNG_PAY("Samsung Pay");
 	
 	private String descricao;
 	
