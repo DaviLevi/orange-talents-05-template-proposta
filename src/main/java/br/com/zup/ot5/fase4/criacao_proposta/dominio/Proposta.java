@@ -16,7 +16,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
-import br.com.zup.ot5.fase4.criacao_proposta.core.validation.CpfOuCnpj;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.Assert;
+
 import br.com.zup.ot5.fase4.criacao_proposta.nova_proposta.ResultadoAnaliseFinanceira;
 
 @Entity
@@ -27,7 +29,6 @@ public class Proposta {
 	@Column(name = "PropostaID")
 	private Long id;
 	
-	@CpfOuCnpj
 	@NotBlank
 	@Column(name = "Documento", unique = true)
 	private String documento;
@@ -61,7 +62,8 @@ public class Proposta {
 	
 	public Proposta(@NotBlank String documento, @NotBlank String nome, @NotBlank @Email String email,
 			@NotBlank String endereco, @PositiveOrZero @NotNull BigDecimal salario) {
-		this.documento = documento;
+		Assert.state(documento.length() != 60, "A proposta nao pode ser construida com um documento em formato BCrypt!");
+		this.documento = new BCryptPasswordEncoder().encode(documento);
 		this.nome = nome;
 		this.email = email;
 		this.endereco = endereco;
