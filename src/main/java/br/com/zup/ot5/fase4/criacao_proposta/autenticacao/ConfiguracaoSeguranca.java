@@ -19,6 +19,7 @@ public class ConfiguracaoSeguranca extends WebSecurityConfigurerAdapter {
                                 .antMatchers(HttpMethod.POST, "/cartoes/**").hasAuthority("SCOPE_cartoes:escrita")
                                 .antMatchers(HttpMethod.PUT, "/cartoes/**").hasAuthority("SCOPE_cartoes:escrita")
                                 .antMatchers(HttpMethod.POST, "/propostas/**").hasAuthority("SCOPE_propostas:escrita")
+                                .antMatchers(HttpMethod.GET, "/actuator/prometheus").permitAll()
                                 .anyRequest().authenticated()
                 )
             .sessionManagement()
